@@ -1,4 +1,4 @@
-from get_files_info import *
+from functions.get_files_info import *
 
 test_cases = (
     ("calculator", "."),
