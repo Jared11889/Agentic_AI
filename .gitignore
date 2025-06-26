@@ -1,3 +1,4 @@
 *.env
 *.vscode/launch.json
 *.pyc
+functions/__pycache__/get_files_info.cpython-312.pyc
