@@ -1,12 +1,17 @@
 import os
 
-def get_files_info(working_directory, directory=None):
-
+def get_absolute_locations(working_directory, target):
     try:
         abs_working_directory = os.path.abspath(working_directory)
-        abs_directory = os.path.abspath(os.path.join(abs_working_directory, directory))
+        abs_directory = os.path.abspath(os.path.join(abs_working_directory, target))
     except Exception as error:
         print(f"Error: {error}")
+
+    return abs_working_directory, abs_directory
+
+def get_files_info(working_directory, directory=None):
+
+    abs_working_directory, abs_directory = get_absolute_locations(working_directory, directory)
 
     try:
         if not abs_directory.startswith(abs_working_directory):
@@ -35,11 +40,7 @@ def get_files_info(working_directory, directory=None):
 
 def get_file_content(working_directory, file_path, MAX_CHARS=10000):
 
-    try:
-        abs_working_directory = os.path.abspath(working_directory)
-        abs_file_path = os.path.abspath(os.path.join(abs_working_directory, file_path))
-    except Exception as error:
-        print(f"Error: {error}")
+    abs_working_directory, abs_file_path = get_absolute_locations(working_directory, file_path)
 
     try:
         if not abs_file_path.startswith(abs_working_directory):
@@ -59,3 +60,6 @@ def get_file_content(working_directory, file_path, MAX_CHARS=10000):
         print(f"Error: {error}")
 
     return file_content_string
+
+
+# def write_file(working_directory, file_path, content):
