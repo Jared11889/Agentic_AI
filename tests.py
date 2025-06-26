@@ -1,5 +1,4 @@
-from functions.get_files_info import *
-from functions.get_file_content import *
+from functions.file_handlers import *
 
 #####Used to test get_files_info.py.#####
 # test_cases = (

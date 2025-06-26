@@ -1,4 +1,4 @@
-import os
+from functions.file_handlers import *
 
 def get_file_content(working_directory, file_path, MAX_CHARS=10000):
 
