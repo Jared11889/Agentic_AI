@@ -85,7 +85,7 @@ def write_file(working_directory, file_path, content):
     try:
         with open(abs_file_path, "w") as file:
             file.write(content)
-            print(f'Successfully wrote to "{file_path}" ({len(content)} characters written)')
+            return f'Successfully wrote to "{file_path}" ({len(content)} characters written)'
     except Exception as error:
-        print(f"Error: {error}")        
+        print(f"Error: {error}")
     
