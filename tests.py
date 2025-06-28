@@ -1,4 +1,5 @@
-from functions.file_handlers import *
+# from functions.file_handlers import *
+from functions.run_python import *
 
 #####Used to test get_files_info#####
 # test_cases = (
@@ -30,15 +31,32 @@ from functions.file_handlers import *
 
 # test_file_content(content_cases)
 
-write_cases = (
-    ("calculator", "lorem.txt", "wait, this isn't lorem ipsum"),
-    ("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"),
-    ("calculator", "/tmp/temp.txt", "this should not be allowed"),
+
+#####Used to test file_write#####
+# write_cases = (
+#     ("calculator", "lorem.txt", "wait, this isn't lorem ipsum"),
+#     ("calculator", "pkg/morelorem.txt", "lorem ipsum dolor sit amet"),
+#     ("calculator", "/tmp/temp.txt", "this should not be allowed")
+# )
+
+# def test_file_write(cases):
+#     for case in cases:
+#         print(f"Input: {case}")
+#         print(write_file(*case))
+
+# test_file_write(write_cases)
+
+
+run_cases = (
+    ("calculator", "main.py"),
+    ("calculator", "tests.py"),
+    ("calculator", "../main.py"),
+    ("calculator", "nonexistent.py")
 )
 
-def test_file_write(cases):
+def test_run_python(cases):
     for case in cases:
         print(f"Input: {case}")
-        print(write_file(*case))
+        print(run_python_file(*case))
 
-test_file_write(write_cases)
+test_run_python(run_cases)
