@@ -13,6 +13,7 @@ def get_files_info(working_directory, directory=None):
 
     abs_working_directory, abs_directory = get_absolute_locations(working_directory, directory)
 
+    #valid working directory check
     try:
         if not abs_directory.startswith(abs_working_directory):
             return f'Error: Cannot list "{directory}" as it is outside the permitted working directory'
@@ -20,14 +21,13 @@ def get_files_info(working_directory, directory=None):
             return f'Error: "{directory}" is not a directory'
     except Exception as error:
         print(f"Error: {error}")
-    
+
     try:
         dir = os.listdir(abs_directory)
     except Exception as error:
         print(f"Error: {error}")
 
     result = ""
-
     for item in dir:
         try:
             filesize = os.path.getsize(os.path.join(abs_directory, item))
@@ -42,6 +42,7 @@ def get_file_content(working_directory, file_path, MAX_CHARS=10000):
 
     abs_working_directory, abs_file_path = get_absolute_locations(working_directory, file_path)
 
+    #valid working directory check
     try:
         if not abs_file_path.startswith(abs_working_directory):
             return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
@@ -62,4 +63,29 @@ def get_file_content(working_directory, file_path, MAX_CHARS=10000):
     return file_content_string
 
 
-# def write_file(working_directory, file_path, content):
+def write_file(working_directory, file_path, content):
+
+    abs_working_directory, abs_file_path = get_absolute_locations(working_directory, file_path)
+
+    #valid working directory check
+    try:
+        if not abs_file_path.startswith(abs_working_directory):
+            return f'Error: Cannot list "{file_path}" as it is outside the permitted working directory'
+    except Exception as error:
+        print(f"Error: {error}")
+
+    #make directory if needed
+    try:
+        if not os.path.isdir(os.path.split(abs_file_path)[0]):
+            os.makedirs(os.path.split(abs_file_path)[0],exist_ok=True)
+    except Exception as error:
+        print(f"Error: {error}")
+
+    #create file
+    try:
+        with open(abs_file_path, "w") as file:
+            file.write(content)
+            print(f'Successfully wrote to "{file_path}" ({len(content)} characters written)')
+    except Exception as error:
+        print(f"Error: {error}")        
+    
