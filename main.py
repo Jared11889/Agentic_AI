@@ -4,7 +4,9 @@ import argparse
 from google import genai
 from google.genai import types
 from dotenv import load_dotenv
+from functions.run_python import *
 
+working_directory = "./calculator"
 system_prompt = """
 You are a helpful AI coding agent.
 
@@ -17,6 +19,48 @@ When a user asks a question or makes a request, make a function call plan. You c
 
 All paths you provide should be relative to the working directory. You do not need to specify the working directory in your function calls as it is automatically injected for security reasons.
 """
+
+
+def call_function(function_call_part, verbose=False):
+
+    function_call_part.args.update({"working_directory": working_directory})
+
+
+    if verbose:
+        print(f"Calling function: {function_call_part.name}({function_call_part.args})")
+    else:
+        print(f" - Calling function: {function_call_part.name}") 
+
+    match function_call_part.name:
+        case "get_files_info":
+            result = get_files_info(**function_call_part.args)
+        case "get_file_content":
+            result = get_file_content(**function_call_part.args)
+        case "run_python_file":
+            result = run_python_file(**function_call_part.args)
+        case "write_file":
+            result = write_file(**function_call_part.args)
+        case _:
+            return types.Content(
+                role="tool",
+                parts=[
+                    types.Part.from_function_response(
+                        name=function_call_part.name,
+                        response={"error": f"Unknown function: {function_call_part.name}"},
+                    )
+                ],
+            )
+        
+    return types.Content(
+        role="tool",
+        parts=[
+            types.Part.from_function_response(
+                name=function_call_part.name,
+                response={"result": result},
+            )
+        ],
+    )
+
 
 def main(args):
     load_dotenv()
@@ -106,10 +150,16 @@ def main(args):
     print(response.text)
     if response.function_calls:
         print(f"Calling function: {response.function_calls[0].name}({response.function_calls[0].args})")
-    if args.verbose:
-        print(f"User prompt: {args.user_prompt}")
-        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+        result = call_function(response.function_calls[0])
+        if args.verbose:
+            print(f"User prompt: {args.user_prompt}")
+            print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+            print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+            if result.parts[0].function_response.response:
+                print(f"-> {result.parts[0].function_response.response["result"]}")
+            else:
+                raise Exception("Unknown Function")
+
 
 
 if __name__ == "__main__": 

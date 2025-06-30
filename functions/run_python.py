@@ -17,7 +17,7 @@ def run_python_file(working_directory, file_path):
 
         CompletedProcess = None
     try:
-        CompletedProcess = subprocess.run(abs_file_path, timeout=30, cwd = abs_working_directory, shell=True)
+        CompletedProcess = subprocess.run(["python3", abs_file_path], timeout=30, cwd = abs_working_directory, capture_output=True, text=True)
     except Exception as error:
         return f"Error: executing Python file: {error}"
 
