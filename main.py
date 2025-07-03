@@ -7,6 +7,7 @@ from dotenv import load_dotenv
 from functions.run_python import *
 
 working_directory = "./calculator"
+max_iterations = 20
 system_prompt = """
 You are a helpful AI coding agent.
 
@@ -62,13 +63,7 @@ def call_function(function_call_part, verbose=False):
     )
 
 
-def main(args):
-    load_dotenv()
-    api_key = os.environ.get("GEMINI_API_KEY")
-    client = genai.Client(api_key=api_key)
-
-    messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
-
+def get_available_functions():
     schema_get_files_info = types.FunctionDeclaration(
         name="get_files_info",
         description="Lists files in the specified directory along with their sizes, constrained to the working directory.",
@@ -138,11 +133,21 @@ def main(args):
         ]
     )
 
+    return available_functions
+
+
+def main(args):
+    load_dotenv()
+    api_key = os.environ.get("GEMINI_API_KEY")
+    client = genai.Client(api_key=api_key)
+
+    messages = [types.Content(role="user", parts=[types.Part(text=args.user_prompt)])]
+
     response = client.models.generate_content(
         model="gemini-2.0-flash-001", 
         contents=messages,
         config=types.GenerateContentConfig(
-            tools=[available_functions],
+            tools=[get_available_functions()],
             system_instruction=system_prompt
         )
     )
@@ -151,16 +156,15 @@ def main(args):
     if response.function_calls:
         print(f"Calling function: {response.function_calls[0].name}({response.function_calls[0].args})")
         result = call_function(response.function_calls[0])
-        if args.verbose:
-            print(f"User prompt: {args.user_prompt}")
-            print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
-            print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
-            if result.parts[0].function_response.response:
-                print(f"-> {result.parts[0].function_response.response["result"]}")
-            else:
-                raise Exception("Unknown Function")
-
-
+        if result.parts[0].function_response.response:
+            print(f"-> {result.parts[0].function_response.response["result"]}")
+        else:
+            raise Exception("Unknown Function")
+    if args.verbose:
+        print(f"User prompt: {args.user_prompt}")
+        print(f"Prompt tokens: {response.usage_metadata.prompt_token_count}")
+        print(f"Response tokens: {response.usage_metadata.candidates_token_count}")
+            
 
 if __name__ == "__main__": 
     #Check for prompt
@@ -174,9 +178,6 @@ if __name__ == "__main__":
     args = arg_parser.parse_args()
 
     main(args)
-
-
-
 else:
     print("Please run from main.py")
     sys.exit(1)
