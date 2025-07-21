@@ -1,4 +1,5 @@
 import os
+from config import MAX_CHARS
 
 def get_absolute_locations(working_directory, target):
     try:
@@ -38,7 +39,7 @@ def get_files_info(working_directory, directory=None):
     return result
 
 
-def get_file_content(working_directory, file_path, MAX_CHARS=10000):
+def get_file_content(working_directory, file_path, MAX_CHARS=MAX_CHARS):
 
     abs_working_directory, abs_file_path = get_absolute_locations(working_directory, file_path)
 
