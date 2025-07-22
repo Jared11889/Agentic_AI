@@ -2,6 +2,7 @@ import os
 from config import MAX_CHARS
 
 def get_absolute_locations(working_directory, target):
+    if target == None: target = ""
     try:
         abs_working_directory = os.path.abspath(working_directory)
         abs_directory = os.path.abspath(os.path.join(abs_working_directory, target))
